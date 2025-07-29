@@ -17,7 +17,7 @@ onMounted(async () => {
       return;
     }
 
-    const res = await fetch('http://localhost:3000/@me', {
+    const res = await fetch('https://auth.lanny.dev/@me', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -44,7 +44,7 @@ const logout = () => {
 
 const login = async () => {
   try {
-    const res = await fetch('http://localhost:3000/login', {
+    const res = await fetch('https://auth.lanny.dev/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
