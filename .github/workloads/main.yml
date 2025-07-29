@@ -1,0 +1,65 @@
+name: Deploy Auth Project
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4.2.2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4.2.0
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: Install dependencies (frontend)
+        working-directory: frontend
+        run: yarn install --frozen-lockfile
+
+      - name: Build frontend
+        working-directory: frontend
+        run: yarn build
+
+      - name: Copy frontend to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.REMOTE_KEY }}
+          port: 22
+          source: "frontend/dist/"
+          target: "/var/www/auth.lanny.dev/"
+          rm: true
+          strip_components: 1
+
+      - name: Copy backend to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.REMOTE_KEY }}
+          port: 22
+          source: "backend/"
+          target: "~/lannydev-auth/"
+          rm: true
+
+      - name: Deploy backend
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.REMOTE_KEY }}
+          port: 22
+          script: |
+            cd ~/lannydev-auth
+            cp ~/env/lannydev-auth.env ~/lannydev-auth/.env
+            yarn install --frozen-lockfile
+            yarn build
+            pm2 restart lannydev-auth || pm2 start dist/main.js --name lannydev-auth
