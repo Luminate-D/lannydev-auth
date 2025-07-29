@@ -3,7 +3,7 @@ name: Deploy Auth Project
 on:
   push:
     branches:
-      - master
+      - main
   workflow_dispatch:
 
 jobs:
