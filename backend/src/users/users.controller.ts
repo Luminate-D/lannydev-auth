@@ -10,6 +10,7 @@ import { ConfigService } from '@nestjs/config';
 import { UsersService } from './users.service';
 import * as JWT from 'jsonwebtoken';
 import { User } from '../entities/user.entity';
+import { Throttle } from '@nestjs/throttler';
 
 @Controller()
 export class UsersController {
@@ -38,6 +39,7 @@ export class UsersController {
 
   // TODO: use DTO
   @Post('/login')
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
   async login(
     @Body('username') username: string,
     @Body('password') password: string
@@ -55,6 +57,7 @@ export class UsersController {
   }
 
   @Post('/register')
+  @Throttle({ default: { limit: 1, ttl: 60000 } })
   async register(@Body('username') username: string, @Body('password') password: string) {
     if (!username || !password) throw new BadRequestException('Username and password are required');
 

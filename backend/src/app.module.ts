@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
@@ -25,6 +26,12 @@ import { UsersModule } from './users/users.module';
         // WARNING: In production, you should not use auto schema synchronization, or when using migrations.
         synchronize: true
       })
+    }),
+
+    ThrottlerModule.forRoot({
+      throttlers: [
+        { ttl: 60000, limit: 10 }
+      ]
     }),
 
     UsersModule
