@@ -12,7 +12,7 @@ onMounted(async () => {
   if(!token) return router.push('/login');
 
   try {
-    const res = await fetch('https://auth.lanny.dev/@me', {
+    const res = await fetch('https://auth.lanny.dev/api/@me', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

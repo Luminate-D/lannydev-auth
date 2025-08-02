@@ -17,7 +17,7 @@ const login = async () => {
   }
 
   try {
-    const res = await fetch('https://auth.lanny.dev/login', {
+    const res = await fetch('https://auth.lanny.dev/api/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

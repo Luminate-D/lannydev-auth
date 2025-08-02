@@ -20,7 +20,7 @@ const register = async () => {
   }
 
   try {
-    const res = await fetch('https://auth.lanny.dev/register', {
+    const res = await fetch('https://auth.lanny.dev/api/register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
