@@ -15,7 +15,7 @@ import { PatchUserDTO } from './dto/patchuser.dto';
 import { AuthGuard } from '../auth/auth.guard';
 import { Request } from 'express';
 
-@Controller('users')
+@Controller('api')
 export class UsersController {
   constructor(
     private readonly env: ConfigService,
@@ -24,13 +24,13 @@ export class UsersController {
 
   @Get('/@me')
   @UseGuards(AuthGuard)
-  me(@Req() req: Request): Promise<User | null> {
+  me(@Req() req: Request): Promise<Omit<User, 'password'>> {
     return Object.assign({}, req.user, { password: undefined });
   }
 
   @Patch('/@me')
   @UseGuards(AuthGuard)
-  async updateMe(@Req() req: Request, @Body() data: PatchUserDTO): Promise<User | null> {
+  async updateMe(@Req() req: Request, @Body() data: PatchUserDTO): Promise<User> {
     req.user!.avatarUrl = data.avatarUrl;
     return await this.users.save(req.user!);
   }
