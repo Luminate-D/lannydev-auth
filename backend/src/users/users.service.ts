@@ -36,4 +36,8 @@ export class UsersService {
 
     return await this.users.save(user);
   }
+
+  async save(user: User): Promise<User> {
+    return await this.users.save(user);
+  }
 }

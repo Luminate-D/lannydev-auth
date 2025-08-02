@@ -2,17 +2,20 @@ import {
   BadRequestException,
   Body,
   ConflictException,
-  Controller, Get, Headers,
-  Post,
-  UnauthorizedException,
+  Controller, Get, Headers, Patch,
+  Post, Req,
+  UnauthorizedException, UseGuards,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { UsersService } from './users.service';
 import * as JWT from 'jsonwebtoken';
 import { User } from '../entities/user.entity';
 import { Throttle } from '@nestjs/throttler';
+import { PatchUserDTO } from './dto/patchuser.dto';
+import { AuthGuard } from '../auth/auth.guard';
+import { Request } from 'express';
 
-@Controller()
+@Controller('users')
 export class UsersController {
   constructor(
     private readonly env: ConfigService,
@@ -20,21 +23,16 @@ export class UsersController {
   ) {}
 
   @Get('/@me')
-  async me(@Headers('Authorization') token: string): Promise<User | null> {
-    if (!token || typeof token !== 'string') throw new BadRequestException('No token provided');
+  @UseGuards(AuthGuard)
+  me(@Req() req: Request): Promise<User | null> {
+    return Object.assign({}, req.user, { password: undefined });
+  }
 
-    try {
-      const jwt = JWT.verify(token, this.env.get('APP_SECRET')!) as { username: string };
-      const user = await this.users.find(jwt.username);
-
-      if (!user) throw new UnauthorizedException('Token is valid, but user not found');
-
-      return Object.assign({}, user, { password: undefined });
-    } catch (e: unknown) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-expect-error
-      throw new UnauthorizedException(e.message);
-    }
+  @Patch('/@me')
+  @UseGuards(AuthGuard)
+  async updateMe(@Req() req: Request, @Body() data: PatchUserDTO): Promise<User | null> {
+    req.user!.avatarUrl = data.avatarUrl;
+    return await this.users.save(req.user!);
   }
 
   // TODO: use DTO
