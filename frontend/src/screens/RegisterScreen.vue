@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onBeforeMount, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 const error = ref('');
@@ -7,6 +7,10 @@ const success = ref('');
 const username = ref('');
 const password = ref('');
 const router = useRouter();
+
+onBeforeMount(() => {
+  if(localStorage.getItem('token')) router.push('/');
+});
 
 const register = async () => {
   error.value = '';

@@ -20,7 +20,10 @@ onMounted(async () => {
       }
     });
 
-    currentUser.value = await res.json();
+    const json = await res.json();
+    if(!res.ok) throw new Error(json.message || 'Failed to fetch user data');
+
+    currentUser.value = json;
   } catch (e: any) {
     localStorage.removeItem('token');
     await router.push('/login');
