@@ -30,8 +30,9 @@ onMounted(async () => {
   }
 });
 
-const asCurrent = async () => {
+const asCurrent = () => {
   if(query.has('redirect')) window.location.href = query.get('redirect')! + '?token=' + localStorage.getItem('token');
+  else router.push('/profile');
 };
 
 const logout = () => {
